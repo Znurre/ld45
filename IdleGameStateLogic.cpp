@@ -1,22 +1,29 @@
 #include "IdleGameStateLogic.h"
 
+#include <QImage>
+#include <QPainter>
+
 void IdleGameStateLogic::draw(const GameState &state, QPainter &painter) const
 {
-	Q_UNUSED(state)
-	Q_UNUSED(painter)
+	static const QImage sprite("idle.png");
+
+	const int count = sprite.width() / 128;
+	const int index = (state.elapsed / 300) % count;
+
+	const QRectF targetRect(state.player.x, state.player.y - 128, 128, 128);
+	const QRectF sourceRect(index * 128, 0, 128, 128);
+
+	painter.drawImage(targetRect, sprite, sourceRect);
 }
 
 GameState IdleGameStateLogic::update(const GameState &state, long delta) const
 {
-	Q_UNUSED(delta)
-
-	return state;
+	return state
+		.with_elapsed(state.elapsed + delta);
 }
 
 GameState IdleGameStateLogic::keyPressEvent(const GameState &state, QKeyEvent *event) const
 {
-	Q_UNUSED(event)
-
 	if (event->key() == Qt::Key_Space)
 	{
 		return state

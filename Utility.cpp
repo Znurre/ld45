@@ -7,8 +7,3 @@ QPointF bezier(const double x[], const double y[], double u)
 
 	return QPointF(xu, yu);
 }
-
-int generateOffset()
-{
-	return qrand() % 400;
-}

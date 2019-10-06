@@ -7,7 +7,7 @@
 
 #include "IdleGameStateLogic.h"
 #include "Player.h"
-#include "Puddle.h"
+#include "Tile.h"
 #include "GameState.h"
 
 class Window : public QRasterWindow
@@ -32,7 +32,7 @@ class Window : public QRasterWindow
 
 		GameState m_state;
 
-		QList<Puddle> m_puddles;
+		QList<Tile> m_puddles;
 
 		QElapsedTimer m_timer;
 

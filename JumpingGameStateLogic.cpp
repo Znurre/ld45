@@ -1,31 +1,52 @@
 #include <QtMath>
 #include <QDebug>
+#include <QImage>
+#include <QPainter>
 
 #include "JumpingGameStateLogic.h"
 #include "IdleGameStateLogic.h"
+#include "PuddleGenerator.h"
 
 void JumpingGameStateLogic::draw(const GameState &state, QPainter &painter) const
 {
 	Q_UNUSED(state)
 	Q_UNUSED(painter)
+
+	static const QImage jumping("jumping.png");
+	static const QImage falling("falling.png");
+
+	const QRectF targetRect(state.player.x, state.player.y - 128, 128, 128);
+	const QRectF sourceRect(0, 0, 128, 128);
+
+	if (state.player.f > 0.5)
+	{
+		painter.drawImage(targetRect, falling, sourceRect);
+	}
+	else
+	{
+		painter.drawImage(targetRect, jumping, sourceRect);
+	}
 }
 
 GameState trySpawnPuddles(const GameState &state)
 {
-	if (state.puddles[0].x < (state.player.x - 1000))
+	const long tilesToGenerate = long(state.player.target - state.player.source) / 128;
+
+	TileStorage tiles = state.tiles;
+
+	std::rotate(begin(tiles), begin(tiles) + tilesToGenerate, end(tiles));
+
+	for (auto i = end(tiles) - tilesToGenerate
+		; i != end(tiles)
+		; i++)
 	{
-		PuddleStorage puddles = state.puddles;
-
-		std::rotate(begin(puddles), begin(puddles) + 1, end(puddles));
-
-		puddles[9] = Puddle()
-			.with_x(puddles[8].right() + generateOffset());
-
-		return state
-			.with_puddles(puddles);
+		*i = Tile()
+			.with_index((i - 1)->index + 1)
+			.with_hasPuddle(PuddleGenerator::generate());
 	}
 
-	return state;
+	return state
+		.with_tiles(tiles);
 }
 
 GameState JumpingGameStateLogic::update(const GameState &state, long delta) const
@@ -45,6 +66,7 @@ GameState JumpingGameStateLogic::update(const GameState &state, long delta) cons
 		return state
 			.with_player(state.player
 				.with_x(qMin(target, state.player.x + adjustedDelta))
+				.with_f(position.y() - state.player.y)
 				.with_y(position.y())
 			);
 	}

@@ -4,7 +4,8 @@ SOURCES += \
 	IdleGameStateLogic.cpp \
 	JumpingGameStateLogic.cpp \
 	Player.cpp \
-	Puddle.cpp \
+	PuddleGenerator.cpp \
+	Tile.cpp \
 	Utility.cpp \
 	Window.cpp \
 	main.cpp
@@ -17,7 +18,8 @@ HEADERS += \
 	IdleGameStateLogic.h \
 	JumpingGameStateLogic.h \
 	Player.h \
-	Puddle.h \
+	PuddleGenerator.h \
+	Tile.h \
 	Utility.h \
 	Window.h \
 	Algorithms.h

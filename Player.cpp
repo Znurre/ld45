@@ -1,7 +1,8 @@
 #include "Player.h"
 
 Player::Player()
-	: x(0)
+	: state(Idle)
+	, x(0)
 	, y(0)
 {
 }

@@ -6,11 +6,11 @@
 #include <QKeyEvent>
 
 #include "Player.h"
-#include "Puddle.h"
+#include "Tile.h"
 
 class IGameStateLogic;
 
-using PuddleStorage = std::array<Puddle, 10>;
+using TileStorage = std::array<Tile, 20>;
 
 struct GameState
 {
@@ -19,7 +19,7 @@ struct GameState
 	PROPERTY(long, elapsed)
 
 	PROPERTY(Player, player)
-	PROPERTY(PuddleStorage, puddles)
+	PROPERTY(TileStorage, tiles)
 
 	PROPERTY(const IGameStateLogic *, logic)
 };

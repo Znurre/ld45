@@ -1,5 +1,6 @@
 #include "Window.h"
 #include "Algorithms.h"
+#include "PuddleGenerator.h"
 
 #include <QPainter>
 #include <QDebug>
@@ -15,10 +16,10 @@ Window::Window()
 void Window::paintEvent(QPaintEvent *event)
 {
 	QPainter painter(this);
-	painter.fillRect(event->rect(), Qt::black);
-	painter.setPen(Qt::red);
+	painter.setRenderHint(QPainter::Antialiasing);
+	painter.fillRect(event->rect(), QColor(24, 20, 37));
+	painter.fillRect(0, height() / 2, width(), height() / 2, QColor(234, 212, 170));
 	painter.translate(-(m_state.player.x - width() / 3), height() / 2);
-	painter.drawLine(0, 0, width(), 0);
 
 	if (m_timer.elapsed())
 	{
@@ -30,17 +31,16 @@ void Window::paintEvent(QPaintEvent *event)
 
 		if ((m_elapsed += delta)> 1000)
 		{
-			qDebug() << m_frames;
+//			qDebug() << m_frames;
 
 			m_frames = 0;
 			m_elapsed = 0;
 		}
 	}
 
-	m_state.logic->draw(m_state, painter);
-
 	drawPuddles(painter);
-	drawPlayer(painter);
+
+	m_state.logic->draw(m_state, painter);
 
 	update();
 }
@@ -65,35 +65,50 @@ void Window::keyReleaseEvent(QKeyEvent *event)
 	m_state = m_state.logic->keyReleaseEvent(m_state, event);
 }
 
-Puddle createPuddle(int offset, const Puddle &previous)
+Tile createPuddle(bool hasPuddle, const Tile &previous)
 {
-	return Puddle()
-		.with_x(previous.x + 50 + offset);
+	return Tile()
+		.with_index(previous.index + 1)
+		.with_hasPuddle(hasPuddle);
 }
 
 GameState Window::createState() const
 {
-	std::array<int, 10> offsets;
-	std::generate(begin(offsets), end(offsets), generateOffset);
+	std::array<bool, 20> offsets;
+	std::generate(begin(offsets), end(offsets), &PuddleGenerator::generate);
 
-	PuddleStorage puddles;
+	TileStorage puddles;
 
-	fold_transform(begin(offsets), end(offsets), begin(puddles), Puddle(), createPuddle);
+	const auto seed = Tile()
+		.with_index(-10);
+
+	fold_transform(begin(offsets), end(offsets), begin(puddles), seed, createPuddle);
 
 	return GameState(&m_idleGameStateLogic)
-		.with_puddles(puddles);
-}
-
-void Window::drawPlayer(QPainter &painter)
-{
-	painter.fillRect(m_state.player.x - 10, m_state.player.y - 10, 20, 20, Qt::red);
+		.with_tiles(puddles);
 }
 
 void Window::drawPuddles(QPainter &painter)
 {
-	for (const Puddle &puddle : m_state.puddles)
+	static const QImage image("ground.png");
+
+	for (size_t i = 0; i < m_state.tiles.size(); i++)
 	{
-		painter.setPen(Qt::blue);
-		painter.drawLine(puddle.x, 0, puddle.right(), 0);
+		const Tile &tile = m_state.tiles[i];
+
+		const QRectF targetRect(tile.index * 128, -96, 128, 256);
+
+		if (tile.hasPuddle)
+		{
+			const QRectF sourceRect(256, 0, 128, 256);
+
+			painter.drawImage(targetRect, image, sourceRect);
+		}
+		else
+		{
+			const QRectF sourceRect(128, 0, 128, 256);
+
+			painter.drawImage(targetRect, image, sourceRect);
+		}
 	}
 }

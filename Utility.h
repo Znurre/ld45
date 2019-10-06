@@ -31,6 +31,4 @@ type name;\
 
 QPointF bezier(const double x[], const double y[], double u);
 
-int generateOffset();
-
 #endif // UTILITY_H

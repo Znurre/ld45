@@ -28,7 +28,7 @@ GameState IdleGameStateLogic::keyPressEvent(const GameState &state, QKeyEvent *e
 	{
 		return state
 			.with_logic(&m_chargeGameStateLogic)
-			.with_elapsed(0);
+			.with_charge(0);
 	}
 
 	return state;

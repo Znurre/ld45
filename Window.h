@@ -23,6 +23,8 @@ class Window : public QRasterWindow
 		void keyReleaseEvent(QKeyEvent *event) override;
 
 	private:
+		QRectF getSourceRect(const Tile &tile);
+
 		GameState createState() const;
 
 		void drawPlayer(QPainter &painter);

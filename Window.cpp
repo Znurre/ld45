@@ -88,6 +88,23 @@ GameState Window::createState() const
 		.with_tiles(puddles);
 }
 
+QRectF Window::getSourceRect(const Tile &tile)
+{
+	if (tile.hasPuddle)
+	{
+		if (m_state.player.x / 128 == tile.index &&
+			m_state.player.y == 0 &&
+			m_state.elapsed < 500)
+		{
+			return QRectF(384, 0, 128, 256);
+		}
+
+		return QRectF(256, 0, 128, 256);
+	}
+
+	return QRectF(128, 0, 128, 256);
+}
+
 void Window::drawPuddles(QPainter &painter)
 {
 	static const QImage image("ground.png");
@@ -97,18 +114,8 @@ void Window::drawPuddles(QPainter &painter)
 		const Tile &tile = m_state.tiles[i];
 
 		const QRectF targetRect(tile.index * 128, -96, 128, 256);
+		const QRectF sourceRect = getSourceRect(tile);
 
-		if (tile.hasPuddle)
-		{
-			const QRectF sourceRect(256, 0, 128, 256);
-
-			painter.drawImage(targetRect, image, sourceRect);
-		}
-		else
-		{
-			const QRectF sourceRect(128, 0, 128, 256);
-
-			painter.drawImage(targetRect, image, sourceRect);
-		}
+		painter.drawImage(targetRect, image, sourceRect);
 	}
 }

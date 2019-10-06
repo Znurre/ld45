@@ -9,7 +9,7 @@ void ChargeGameStateLogic::draw(const GameState &state, QPainter &painter) const
 	static const QImage sprite("charge.png");
 
 	const int count = sprite.width() / 128;
-	const int index = (state.elapsed / 100) % count;
+	const int index = (state.charge / 100) % count;
 
 	const QRectF targetRect(state.player.x, state.player.y - 128, 128, 128);
 	const QRectF sourceRect(index * 128, 0, 128, 128);
@@ -34,13 +34,14 @@ void ChargeGameStateLogic::draw(const GameState &state, QPainter &painter) const
 
 GameState ChargeGameStateLogic::update(const GameState &state, long delta) const
 {
-	if (state.elapsed > 512)
+	if (state.charge > 512)
 	{
 		return jump(state);
 	}
 
 	return state
-		.with_elapsed(state.elapsed + delta);
+		.with_elapsed(state.elapsed + delta)
+		.with_charge(state.charge + delta);
 }
 
 GameState ChargeGameStateLogic::keyPressEvent(const GameState &state, QKeyEvent *event) const
@@ -62,7 +63,7 @@ GameState ChargeGameStateLogic::keyReleaseEvent(const GameState &state, QKeyEven
 
 GameState ChargeGameStateLogic::jump(const GameState &state) const
 {
-	const double target  = floor((state.player.x + state.elapsed) / 128) * 128;
+	const double target  = floor((state.player.x + state.charge) / 128) * 128;
 
 	return state
 		.with_logic(&m_jumpingGameStateLogic)

@@ -17,6 +17,7 @@ struct GameState
 	GameState(const IGameStateLogic *logic);
 
 	PROPERTY(long, elapsed)
+	PROPERTY(long, charge)
 
 	PROPERTY(Player, player)
 	PROPERTY(TileStorage, tiles)

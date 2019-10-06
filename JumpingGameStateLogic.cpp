@@ -75,6 +75,7 @@ GameState JumpingGameStateLogic::update(const GameState &state, long delta) cons
 
 	return trySpawnPuddles(state)
 		.with_logic(&logic)
+		.with_elapsed(0)
 		.with_player(state.player
 			.with_y(0)
 		);

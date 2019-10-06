@@ -10,14 +10,20 @@
 
 class IGameStateLogic;
 
-using TileStorage = std::array<Tile, 20>;
+using TileStorage = std::array<Tile, 40>;
 
 struct GameState
 {
 	GameState(const IGameStateLogic *logic);
 
+	GameState updateOffset(long delta) const;
+
 	PROPERTY(long, elapsed)
 	PROPERTY(long, charge)
+	PROPERTY(long, score)
+
+	PROPERTY(double, speed)
+	PROPERTY(double, offset)
 
 	PROPERTY(Player, player)
 	PROPERTY(TileStorage, tiles)

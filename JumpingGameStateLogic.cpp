@@ -6,29 +6,24 @@
 #include "JumpingGameStateLogic.h"
 #include "IdleGameStateLogic.h"
 #include "PuddleGenerator.h"
+#include "Resources.h"
 
 void JumpingGameStateLogic::draw(const GameState &state, QPainter &painter) const
 {
-	Q_UNUSED(state)
-	Q_UNUSED(painter)
-
-	static const QImage jumping("jumping.png");
-	static const QImage falling("falling.png");
-
 	const QRectF targetRect(state.player.x, state.player.y - 128, 128, 128);
 	const QRectF sourceRect(0, 0, 128, 128);
 
 	if (state.player.f > 0.5)
 	{
-		painter.drawImage(targetRect, falling, sourceRect);
+		painter.drawImage(targetRect, Resources::falling(), sourceRect);
 	}
 	else
 	{
-		painter.drawImage(targetRect, jumping, sourceRect);
+		painter.drawImage(targetRect, Resources::jumping(), sourceRect);
 	}
 }
 
-GameState trySpawnPuddles(const GameState &state)
+TileStorage spawnTiles(const GameState &state)
 {
 	const long tilesToGenerate = long(state.player.target - state.player.source) / 128;
 
@@ -45,8 +40,22 @@ GameState trySpawnPuddles(const GameState &state)
 			.with_hasPuddle(PuddleGenerator::generate());
 	}
 
-	return state
-		.with_tiles(tiles);
+	return tiles;
+}
+
+long calcScore(const GameState &state)
+{
+	for (const Tile &tile : state.tiles)
+	{
+		if (tile.index == long(state.player.target / 128))
+		{
+			return tile.hasPuddle
+				? state.score + 10
+				: state.score - 10;
+		}
+	}
+
+	return state.score;
 }
 
 GameState JumpingGameStateLogic::update(const GameState &state, long delta) const
@@ -64,6 +73,7 @@ GameState JumpingGameStateLogic::update(const GameState &state, long delta) cons
 		const auto adjustedDelta = delta * distance / (distance + 700);
 
 		return state
+			.updateOffset(delta)
 			.with_player(state.player
 				.with_x(qMin(target, state.player.x + adjustedDelta))
 				.with_f(position.y() - state.player.y)
@@ -73,8 +83,12 @@ GameState JumpingGameStateLogic::update(const GameState &state, long delta) cons
 
 	static IdleGameStateLogic logic;
 
-	return trySpawnPuddles(state)
+	return state
+		.updateOffset(delta)
+		.with_score(calcScore(state))
+		.with_tiles(spawnTiles(state))
 		.with_logic(&logic)
+		.with_speed(state.speed + 1)
 		.with_elapsed(0)
 		.with_player(state.player
 			.with_y(0)

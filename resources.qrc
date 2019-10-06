@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/fonts">
+        <file>resources/font.ttf</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file>resources/charge.png</file>
+        <file>resources/falling.png</file>
+        <file>resources/ground.png</file>
+        <file>resources/idle.png</file>
+        <file>resources/jumping.png</file>
+    </qresource>
+</RCC>

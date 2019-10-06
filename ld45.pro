@@ -5,6 +5,7 @@ SOURCES += \
 	JumpingGameStateLogic.cpp \
 	Player.cpp \
 	PuddleGenerator.cpp \
+	Resources.cpp \
 	Tile.cpp \
 	Utility.cpp \
 	Window.cpp \
@@ -19,7 +20,11 @@ HEADERS += \
 	JumpingGameStateLogic.h \
 	Player.h \
 	PuddleGenerator.h \
+	Resources.h \
 	Tile.h \
 	Utility.h \
 	Window.h \
 	Algorithms.h
+
+RESOURCES += \
+	resources.qrc
